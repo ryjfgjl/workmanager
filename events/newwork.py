@@ -25,10 +25,10 @@ class NewWork:
         workpath = self.HandleConfig.handle_config("g", "global", "workpath")
         year = str(date.today().year)
         month = str(date.today().month)
-        yearpath = workpath + "\\" + year
-        monthpath = yearpath + "\\" + month
-        worktypepath = monthpath + "\\"  + worktype.replace(' ', '_')
-        jirapath = worktypepath + "\\" + jiraname
+        yearpath = workpath + year + "\\"
+        monthpath = yearpath + month + "\\"
+        worktypepath = monthpath + worktype.replace(' ', '_') + "\\"
+        jirapath = worktypepath + jiraname + "\\"
 
         if not os.path.exists(yearpath):
             os.makedirs(yearpath)
@@ -39,10 +39,10 @@ class NewWork:
         if not os.path.exists(jirapath):
             os.makedirs(jirapath)
 
-        questionpath = jirapath + "\\questions"
-        scriptspath = jirapath + "\\scripts"
-        scriptsbakpath = jirapath + "\\scripts_bak"
-        xlspath = jirapath + "\\xls"
+        questionpath = jirapath + "questions\\"
+        scriptspath = jirapath + "scripts\\"
+        scriptsbakpath = jirapath + "scripts_bak\\"
+        xlspath = jirapath + "xls\\"
         if not os.path.exists(questionpath):
             os.makedirs(questionpath)
         if not os.path.exists(scriptspath):
@@ -55,13 +55,12 @@ class NewWork:
         script = scriptspath + r"\\{}.txt".format(jiraname.replace('-', '_').lower())
         if not os.path.isfile(script):  # only check file not file dictionary
             shutil.copyfile(self.HandleConfig.handle_config("g", "referencefile", "emptytxt"), script)
-        importexcelpath = xlspath + "\\" + "importexcels"
+        importexcelpath = xlspath + "importexcels\\"
         if not os.path.exists(importexcelpath):
             os.makedirs(importexcelpath)
 
         self.HandleConfig.handle_config("a", jiraname)
-        self.HandleConfig.handle_config("s", jiraname, "database", dbname)
-        self.HandleConfig.handle_config("s", jiraname, "jiradb", jiraname.lower())
+        self.HandleConfig.handle_config("s", jiraname, "dbname", dbname)
         self.HandleConfig.handle_config("s", jiraname, "jiraname", jiraname)
         self.HandleConfig.handle_config("s", jiraname, "jirapath", jirapath)
         self.HandleConfig.handle_config("s", jiraname, "worktype", worktype)
@@ -86,9 +85,9 @@ class NewWork:
 
         ]
         window = sg.Window('',layout=layout,)
-
         event, values = window.read()
         window.close()
+
         if event in (None, 'Cancel'):
             return None, None, None
         jiraname = values['jiraname'].strip().upper()

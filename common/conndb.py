@@ -21,25 +21,8 @@ class ConnDB():
         return conn
 
         # execute sql
-    def exec(self, conn, sql, kill=False, COMMAND=None):
-        #conn = self.conndb()
+    def exec(self, conn, sql):
         cur = conn.cursor()
-        database = self.db
-        if kill:
-            killsql = "SELECT CONCAT('kill ',id) FROM information_schema.`PROCESSLIST` WHERE DB = '{}'".format(database)
-            if COMMAND:
-                killsql = "SELECT CONCAT('kill ',id) FROM information_schema.`PROCESSLIST` WHERE DB = '{}' OR COMMAND = 'Sleep'".format(database)
-
-            cur.execute(killsql)
-            killids = cur.fetchall()
-            killids = list(killids)
-
-            idx = 0
-            for killid in killids:
-                killids[idx] = (list(killid))[0]
-                killidsql = killids[idx]
-                cur.execute(killidsql)
-                idx = idx + 1
         for s in sql.split(";"):
             if s != "":
                 cur.execute(s)
@@ -49,9 +32,14 @@ class ConnDB():
         return cur
 
     # exec cmd
-    def cmd(self, db, op, file):
+    def cmd(self, dbname, op, sqlfile):
         if op == "mysql":
-            cmd_statement = "{0} -u{1} -p{2} -h{3} -P{4} {5} --default-character-set=utf8 < \"{6}\"".format(op,self.user,self.passwd,self.host,self.port,db,file)
+            cmd_statement = "{0} -u{1} -p{2} -h{3} -P{4} {5} --default-character-set=utf8 < \"{6}\"".format(op,self.user,self.passwd,self.host,self.port,dbname,sqlfile)
+        elif op == "mysqldump":
+            cmd_statement = "{0} -u{1} -p{2} -h{3} -P{4} {5} -R > \"{6}\"".format(op,self.user,self.passwd,self.host,self.port,dbname,sqlfile)
+        elif op == "mysqldump-no-r":
+            cmd_statement = "mysqldump -u{0} -p{1} -h{2} -P{3} {4} > \"{5}\"".format(self.user,self.passwd,self.host,self.port,dbname,sqlfile)
+
         print(cmd_statement)
         ret = os.system(cmd_statement)
 

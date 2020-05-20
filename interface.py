@@ -48,15 +48,22 @@ while True:
         from events.newwork import NewWork
         NewWork = NewWork()
         NewWork.main()
-
     elif event == 'Import Excel':
-        pass
+        from events.excelimporter import ImportExcel
+        ImportExcel = ImportExcel()
+        ImportExcel.main(currentwork)
     elif event == 'Dump Mysql':
-        pass
+        from events.mysqldump import MysqlDump
+        MysqlDump = MysqlDump()
+        MysqlDump.main(currentwork)
     elif event == 'Restore Mysql':
-        pass
+        from events.mysqlrestore import MysqlRestore
+        MysqlRestore = MysqlRestore()
+        MysqlRestore.main(currentwork)
     elif event == 'Configure Script':
-        pass
+        from events.configurescript import ConfigureScript
+        ConfigureScript = ConfigureScript()
+        ConfigureScript.main(currentwork)
     elif event == 'Run Script':
         pass
     elif event == 'Add Comment':
