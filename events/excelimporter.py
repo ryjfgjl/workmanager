@@ -14,6 +14,7 @@ import chardet
 from datetime import date
 from common.handleconfig import HandleConfig
 from common.conndb import ConnDB
+from events.mysqldump import MysqlDump
 import PySimpleGUI as sg
 
 sg.ChangeLookAndFeel('GreenTan')
@@ -24,6 +25,7 @@ class ImportExcel:
 
         self.HandleConfig = HandleConfig()
         self.ConnDB = ConnDB()
+        self.MysqlDump = MysqlDump()
         self.img = self.HandleConfig.handle_config("g", "referencefile", "img")
         self.cleansql = self.HandleConfig.handle_config("g", "referencefile", "cleanexcel")
         self.nickname = self.HandleConfig.handle_config("g", "global", "nickname")
@@ -176,7 +178,7 @@ class ImportExcel:
                 return
 
             layout = [
-                [sg.Text("Clean and Dump database {} now?".format(self.dbname))],
+                [sg.Text("Clean database {} now?".format(self.dbname))],
                 [sg.Button('Yes', key='y'), sg.Button('No', key='n')]
             ]
             window = sg.Window('',layout)

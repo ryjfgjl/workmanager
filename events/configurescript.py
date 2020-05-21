@@ -73,6 +73,7 @@ class ConfigureScript:
         lines_new = lines[:idx_s+1] + li + lines[idx_e:]
         with open(configration_sql_new, 'w') as fw:
             fw.writelines(lines_new)
+        """
         sqlfiles = [
             scriptspath + '\\{0}_bakup.sql'.format(dbname),
             gitscriptpath + '\\somke_test_pre.sql',
@@ -82,7 +83,10 @@ class ConfigureScript:
         ]
         ret = self.MysqlRestore.main(currentwork, sqlfiles)
         if ret:
-            self.MysqlDump.main(currentwork)
+            self.MysqlDump.main(currentwork, bakup=True)
+            sg.Popup('Complete!')
+        else:
+            sg.Popup('Failed!')"""
 
 
 

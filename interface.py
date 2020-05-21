@@ -32,7 +32,7 @@ while True:
         [sg.Button(button_text='Configure Script', size=(15, 3)),
          sg.Button(button_text='Run Script', size=(15, 3))],
         [sg.Text('-' * 160)],
-        [sg.Button(button_text='Add Comment', size=(30, 3)), sg.Text(' ' * 70),
+        [sg.Button(button_text='Add Comment', size=(30, 3), disabled=True), sg.Text(' ' * 70),
          sg.Button(button_text='Quit', size=(10, 5))],
 
     ]
@@ -65,13 +65,19 @@ while True:
         ConfigureScript = ConfigureScript()
         ConfigureScript.main(currentwork)
     elif event == 'Run Script':
-        pass
+        from events.runscript import RunScript
+        RunScript = RunScript()
+        RunScript.main(currentwork)
     elif event == 'Add Comment':
         pass
     elif event == 'Change Work':
-        pass
+        from events.changework import ChangeWork
+        ChangeWork = ChangeWork()
+        ChangeWork.main()
     elif event == 'Delete Work':
-        pass
+        from events.deletework import DeleteWork
+        DeleteWork = DeleteWork()
+        DeleteWork.main(currentwork)
     elif event == 'Add Work':
         pass
     window.close()
