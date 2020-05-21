@@ -26,27 +26,27 @@ class RunScript:
         script = navicat_script_path + dbname + '\\{}.sql'.format(currentwork)
         lines = []
         files = [
-            scriptspath + '\\configuration.sql',
-            gitscriptpath + '\\functionAndProcedure.sql',
+            scriptspath + 'configuration.sql',
+            gitscriptpath + 'functionAndProcedure.sql',
             script,
-            gitscriptpath + '\\accountMerge.sql',
-            gitscriptpath + '\\fullDataClean.sql'
+            gitscriptpath + 'accountMerge.sql',
+            gitscriptpath + 'fullDataClean.sql'
         ]
         for f in files:
             with open(f, 'r') as fa:
                 flines = fa.readlines()
                 lines.append(flines)
                 lines.append('\n')
-        with open(scriptspath + '\\{0}.txt'.format(dbname), 'w') as fw:
+        with open(scriptspath + '{0}.txt'.format(dbname), 'w') as fw:
             fw.writelines(lines)
 
 
         sqlfiles = [
-            scriptspath + '\\{0}_bakup.sql'.format(dbname),
-            gitscriptpath + '\\somke_test_b4.sql',
-            scriptspath + '\\{0}.sql'.format(dbname),
-            scriptspath + '\\{0}.txt'.format(dbname),
-            gitscriptpath + '\\somke_test_after.sql'
+            scriptspath + '{0}_bakup.sql'.format(dbname),
+            gitscriptpath + 'somke_test_b4.sql',
+            scriptspath + '{0}.sql'.format(dbname),
+            scriptspath + '{0}.txt'.format(dbname),
+            gitscriptpath + 'somke_test_after.sql'
         ]
         self.MysqlRestore.main(currentwork, sqlfiles)
         sg.Popup('Complete!')
