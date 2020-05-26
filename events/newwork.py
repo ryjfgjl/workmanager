@@ -16,26 +16,27 @@ class NewWork:
 
     def __init__(self):
         self.HandleConfig = HandleConfig()
-        self.image = self.HandleConfig.handle_config("g", "referencefile", "img")
 
     def main(self):
-        workpath = self.HandleConfig.handle_config("g", "global", "workpath")
+        workpath = self.HandleConfig.handle_config("g", "defaultpath", "workpath")
         jiraname, dbname, worktype, existwork = self.input_workinfo(workpath)
-        if not dbname:
+        if not worktype:
             return
         if existwork:
             jirapath = existwork.replace('/','\\') + '\\'
-            importexcelpath = jirapath + "\\xls\\importexcels\\"
-            pattern = re.compile(r"^.*?\\(\d{4})\\(\d{1,2})\\(.*?)\\(.*?)\\$", re.S)
+            pattern = re.compile(r"^.*?\\(\d{4})\\(\d{1,2})\\(.*?)\\(.*?)\\scripts\\(.*?)\.txt\\$", re.S)
             match = re.match(pattern, jirapath)
+
             if match:
                 worktype = match.group(3).replace('_',' ')
                 jiraname = match.group(4)
-                scriptspath = jirapath + 'scripts\\'
+                dbname = match.group(5)
             else:
                 sg.Popup('Error')
                 return
-
+            pattern = re.compile(r"^(.*?)\\scripts\\{0}\.txt\\$".format(dbname), re.S)
+            match = re.match(pattern, jirapath)
+            jirapath = match.group(1) + '\\'
 
         else:
             year = str(date.today().year)
@@ -54,12 +55,9 @@ class NewWork:
             if not os.path.exists(jirapath):
                 os.makedirs(jirapath)
 
-            questionpath = jirapath + "questions\\"
             scriptspath = jirapath + "scripts\\"
             scriptsbakpath = jirapath + "scripts_bak\\"
-            xlspath = jirapath + "xls\\"
-            if not os.path.exists(questionpath):
-                os.makedirs(questionpath)
+            xlspath = jirapath + "xlsx\\"
             if not os.path.exists(scriptspath):
                 os.makedirs(scriptspath)
             if not os.path.exists(scriptsbakpath):
@@ -67,22 +65,32 @@ class NewWork:
             if not os.path.exists(xlspath):
                 os.makedirs(xlspath)
 
-            script = scriptspath + r"\\{}.txt".format(jiraname.replace('-', '_').lower())
+            script = scriptspath + r"\\{}.txt".format(dbname)
             if not os.path.isfile(script):  # only check file not file dictionary
                 shutil.copyfile(self.HandleConfig.handle_config("g", "referencefile", "emptytxt"), script)
             importexcelpath = xlspath + "importexcels\\"
+            questionpath = xlspath + "questions\\"
             if not os.path.exists(importexcelpath):
                 os.makedirs(importexcelpath)
+            if not os.path.exists(questionpath):
+                os.makedirs(questionpath)
+
+            git_repo_path = self.HandleConfig.handle_config("g", "defaultpath", "git_repo_path")
+            gitscriptpath = git_repo_path + 'dataImportScript\\script\\'
+            configration_sql = gitscriptpath + 'configration.sql'
+            configration_sql_new = jirapath + 'scripts\\configration.sql'
+            shutil.copy(configration_sql, configration_sql_new)
 
         self.HandleConfig.handle_config("a", jiraname)
         self.HandleConfig.handle_config("s", jiraname, "dbname", dbname)
         self.HandleConfig.handle_config("s", jiraname, "jiraname", jiraname)
         self.HandleConfig.handle_config("s", jiraname, "jirapath", jirapath)
         self.HandleConfig.handle_config("s", jiraname, "worktype", worktype)
-        self.HandleConfig.handle_config("s", jiraname, "importexcelpath", importexcelpath)
+        self.HandleConfig.handle_config("s", jiraname, "merge", 'True')
         self.HandleConfig.handle_config("s", "worklist", jiraname, jiraname)
+        self.HandleConfig.handle_config("s", "global", "currentwork", jiraname)
 
-        sg.Popup('Complete!')
+        sg.Popup('\n    Complete!         \n',)
 
 
     def input_workinfo(self, workpath):
@@ -102,7 +110,7 @@ class NewWork:
             [sg.InputText(key='dbname')],
 
             [sg.Text('Work Directionay')],
-            [sg.InputText('', key='e'), sg.FolderBrowse(initial_folder=workpath)],
+            [sg.InputText('', key='e'), sg.FileBrowse(initial_folder=workpath)],
             [sg.Submit(tooltip='Click to submit this form'), sg.Cancel()]
 
         ]
@@ -121,7 +129,7 @@ class NewWork:
             worktype = 'Fix Import'
         existwork = values['e']
 
-        if (existwork != '' and dbname == '') or (existwork == '' and (dbname == '' or jiraname =='')):
+        if existwork == '' and (dbname == '' or jiraname ==''):
             sg.Popup('Jira Name or Database Name or Work Dictionary can not be blank!')
             self.input_workinfo(workpath)
             return None, None, None, None

@@ -3,26 +3,24 @@ from common.conndb import ConnDB
 import PySimpleGUI as sg
 import shutil
 from events.mysqlrestore import MysqlRestore
-from events.mysqldump import MysqlDump
 
 sg.ChangeLookAndFeel('GreenTan')
 
 
-class ConfigureScript:
+class ConfigScript:
 
     def __init__(self):
         self.HandleConfig = HandleConfig()
         self.MysqlRestore = MysqlRestore()
-        self.MysqlDump = MysqlDump()
         self.ConnDB = ConnDB()
         self.conn = self.ConnDB.conndb()
-        self.imgpath = self.HandleConfig.handle_config("g", "referencefile", "img")
 
     def main(self, currentwork):
         jirapath = self.HandleConfig.handle_config("g", currentwork, "jirapath")
+        jiraname = self.HandleConfig.handle_config("g", currentwork, "jiraname")
         dbname = self.HandleConfig.handle_config("g", currentwork, "dbname")
         scriptspath = jirapath + "scripts\\"
-        git_repo_path = self.HandleConfig.handle_config("g", "global", "git_repo_path")
+        git_repo_path = self.HandleConfig.handle_config("g", "defaultpath", "git_repo_path")
         gitscriptpath = git_repo_path + 'dataImportScript\\script\\'
         configration_sql = gitscriptpath + 'configration.sql'
         configration_sql_new = jirapath + 'scripts\\configration.sql'
@@ -52,13 +50,15 @@ class ConfigureScript:
             [sg.Text(k7), sg.Combo(('Yes', 'No'), default_value='Yes', key=k7)],
             [sg.Text(k8), sg.Combo(('Yes', 'No'), default_value='Yes', key=k8)],
             [sg.Text(k9), sg.Combo(('Yes', 'No'), default_value='Yes', key=k9)],
-            [sg.Text(k10), sg.Combo(('Yes', 'No'), key=k10)],
+            [sg.Text(k10), sg.InputText('', key=k10)],
             [sg.Text(k11), sg.InputText('Legacy ID', key=k11)],
             [sg.Submit(tooltip='Click to submit this form'), sg.Cancel()]
         ]
         window = sg.Window('', layout)
         event, values = window.read()
         window.close()
+        if event in (None, 'Cancel'):
+            return
         li = []
         sql_pre = 'INSERT INTO z_newcreate_data_import_config(taskName,taskValue) VALUES('
         for key, value in values.items():
@@ -66,27 +66,18 @@ class ConfigureScript:
                 value = 'NULL'
             sql = sql_pre + '"' + key + '",' + '"' + value + '");\n'
             li.append(sql)
-        with open(configration_sql_new, 'r') as fa:
+        with open(configration_sql_new, 'r', encoding='utf8') as fa:
             lines = fa.readlines()
         idx_s = lines.index('# Custom Conigurations Start\n')
         idx_e = lines.index('# Custom Conigurations End\n')
         lines_new = lines[:idx_s+1] + li + lines[idx_e:]
-        with open(configration_sql_new, 'w') as fw:
+        with open(configration_sql_new, 'w', encoding='utf8') as fw:
             fw.writelines(lines_new)
-        """
-        sqlfiles = [
-            scriptspath + '\\{0}_bakup.sql'.format(dbname),
-            gitscriptpath + '\\somke_test_pre.sql',
-            scriptspath + '\\{0}.sql'.format(dbname),
-            scriptspath + '\\configuration.sql',
-            gitscriptpath + '\\functionAndProcedure.sql'
-        ]
-        ret = self.MysqlRestore.main(currentwork, sqlfiles)
-        if ret:
-            self.MysqlDump.main(currentwork, bakup=True)
-            sg.Popup('Complete!')
-        else:
-            sg.Popup('Failed!')"""
+        merge = 'True'
+        if values[k2] == 'Do Not De-Dupe':
+            merge = 'False'
+        self.HandleConfig.handle_config("s", jiraname, "merge", merge)
+        self.MysqlRestore.main(currentwork)
 
 
 

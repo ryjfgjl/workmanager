@@ -17,8 +17,6 @@ class MysqlDump:
 
         self.HandleConfig = HandleConfig()
         self.ConnDB = ConnDB()
-        self.imgpath = self.HandleConfig.handle_config("g", "referencefile", "img")
-        self.use_server = self.HandleConfig.handle_config("g", "global", "use_server")
 
     def main(self, currentwork):
 
@@ -49,8 +47,8 @@ class MysqlDump:
         op = "mysqldump-no-r"
 
         if gz:
-            sqlfile = jirapath + "fulldata\\" + sqlfile
-            sqlfile_gzip = jirapath + "\\fulldata\\{0}.sql.gz".format(dbname)
+            sqlfile = jirapath + "scripts_bak\\" + sqlfile
+            sqlfile_gzip = jirapath + "\\scripts_bak\\{0}.sql.gz".format(dbname)
             op = 'mysqldump'
             ret = self.ConnDB.cmd(dbname, op, sqlfile)
             if ret == 0:
@@ -67,3 +65,8 @@ class MysqlDump:
                 now = datetime.now().strftime('%b-%d-%Y %H:%M:%S').replace(' ', '').replace(':', '')
                 newfile = jirapath + "\\scripts_bak\\{0}".format(dbname) + "_" + now + "_bak.sql"
                 shutil.copy(sqlfile, newfile)
+
+        if ret == 0:
+            sg.Popup('\n    Complete!         \n', )
+        else:
+            sg.Popup('\n    Error!         \n', )

@@ -14,7 +14,6 @@ import chardet
 from datetime import date
 from common.handleconfig import HandleConfig
 from common.conndb import ConnDB
-from events.mysqldump import MysqlDump
 import PySimpleGUI as sg
 
 sg.ChangeLookAndFeel('GreenTan')
@@ -25,16 +24,13 @@ class ImportExcel:
 
         self.HandleConfig = HandleConfig()
         self.ConnDB = ConnDB()
-        self.MysqlDump = MysqlDump()
-        self.img = self.HandleConfig.handle_config("g", "referencefile", "img")
         self.cleansql = self.HandleConfig.handle_config("g", "referencefile", "cleanexcel")
-        self.nickname = self.HandleConfig.handle_config("g", "global", "nickname")
-        self.conn = self.HandleConfig.handle_config("g", "global", "use_server")
-        self.indentify_col_name = int(self.HandleConfig.handle_config("g", "global", "indentify_col_name"))
+        self.nickname = self.HandleConfig.handle_config("g", "excelimporter", "nickname")
+        self.indentify_col_name = int(self.HandleConfig.handle_config("g", "excelimporter", "indentify_col_name"))
 
     def main(self, currentwork):
         self.dbname = self.HandleConfig.handle_config("g", currentwork, "dbname")
-        self.importexcelpath = self.HandleConfig.handle_config("g", currentwork, "importexcelpath")
+        self.importexcelpath = self.HandleConfig.handle_config("g", currentwork, "jirapath") + 'xlsx\\importexcels\\'
 
         excelcsvs = self.get_excel()
         if not excelcsvs:
