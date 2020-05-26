@@ -5,7 +5,7 @@ authorL zxb
 date:2020-05-19
 """
 
-Version = 1.0
+Version = '1.0.1'
 
 # -------------------------- Program Interface -------------------------- #
 
@@ -30,9 +30,9 @@ while True:
     try:
         currentwork = HandleConfig.handle_config("g", "global", "currentwork")
 
-        # menu_def = [['&Setting', ['&Edit Config', '&Check Update']]]
+        menu_def = [['&Setting', ['&Edit Config', '&Load Config', '&Check Update']]]
         layout = [
-            # [sg.Menu(menu_def, tearoff=True)],
+            [sg.Menu(menu_def, tearoff=True)],
             [sg.Text('{0}Curent Work: {1}'.format(' '*50,currentwork), text_color='blue', font=15)],
             [sg.Text(' ' * 160)],
             [sg.Button(button_text='New Work', size=(15, 3)),
@@ -58,6 +58,7 @@ while True:
                            location=(1000, 100)
                            )
         event, values = window.read()
+
         if event in (None, 'Quit'):
             break
 
@@ -105,6 +106,19 @@ while True:
             from events.generatecmd import GenerateCMD
             GenerateCMD = GenerateCMD()
             GenerateCMD.main(currentwork)
+        elif event == 'Edit Config':
+            from events.config import Config
+            Config = Config()
+            Config.edit_config()
+        elif event == 'Load Config':
+            from events.config import Config
+            Config = Config()
+            Config.load_config()
+        elif event == 'Check Update':
+            from events.checkupdate import CheckUpdate
+            CheckUpdate = CheckUpdate()
+            CheckUpdate.main(Version)
+
     except:
         sg.PopupError(exception_format())
 

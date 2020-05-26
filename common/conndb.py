@@ -14,7 +14,7 @@ class ConnDB():
         self.passwd = self.HandleConfig.handle_config('g', self.server, 'password')
         self.port = int(self.HandleConfig.handle_config('g', self.server, 'port'))
 
-    def conndb(self, server=None, db=None, charset='utf8'):
+    def conndb(self, db=None, server=None, charset='utf8'):
         if server:
             host = self.HandleConfig.handle_config('g', server, 'host')
             user = self.HandleConfig.handle_config('g', server, 'user')

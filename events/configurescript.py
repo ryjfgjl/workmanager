@@ -18,8 +18,8 @@ class ConfigScript:
     def main(self, currentwork):
         jirapath = self.HandleConfig.handle_config("g", currentwork, "jirapath")
         jiraname = self.HandleConfig.handle_config("g", currentwork, "jiraname")
-        dbname = self.HandleConfig.handle_config("g", currentwork, "dbname")
-        scriptspath = jirapath + "scripts\\"
+        # dbname = self.HandleConfig.handle_config("g", currentwork, "dbname")
+        # scriptspath = jirapath + "scripts\\"
         git_repo_path = self.HandleConfig.handle_config("g", "defaultpath", "git_repo_path")
         gitscriptpath = git_repo_path + 'dataImportScript\\script\\'
         configration_sql = gitscriptpath + 'configration.sql'

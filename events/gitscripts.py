@@ -14,9 +14,7 @@ class GitScripts:
         self.conn = self.ConnDB.conndb()
         self.imgpath = self.HandleConfig.handle_config("g", "referencefile", "img")
 
-    def main(self, currentwork):
-        jirapath = self.HandleConfig.handle_config("g", currentwork, "jirapath")
-        dbname = self.HandleConfig.handle_config("g", currentwork, "dbname")
+    def main(self):
         git_repo_path = self.HandleConfig.handle_config("g", "global", "git_repo_path")
 
         repo = git.Repo(git_repo_path)
