@@ -2,7 +2,7 @@ from common.handleconfig import HandleConfig
 from common.conndb import ConnDB
 import PySimpleGUI as sg
 from events.mysqlrestore import MysqlRestore
-import shutil
+import shutil, os
 
 sg.ChangeLookAndFeel('GreenTan')
 
@@ -33,6 +33,9 @@ class RunScript:
         ]
         if merge == 'False':
             files.remove(gitscriptpath + 'accountMerge.sql')
+        extrascript = scriptspath + 'extrascript.txt'
+        if os.path.exists(extrascript):
+            files.append(extrascript)
         with open(scriptspath + '{0}.txt'.format(dbname), 'w', encoding='utf8') as fw:
             fw.truncate()
         for f in files:
@@ -42,7 +45,7 @@ class RunScript:
                     #fw.write('\n####################\n')
 
         sqlfiles = [
-            scriptspath + '{0}_bakup.sql'.format(dbname),
+            scriptspath + '{0}_backup.sql'.format(dbname),
             gitscriptpath + 'smokeTest.sql',
             scriptspath + '{0}.sql'.format(dbname),
             scriptspath + '{0}.txt'.format(dbname),

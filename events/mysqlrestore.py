@@ -26,7 +26,7 @@ class MysqlRestore:
         scriptspath = jirapath + "scripts\\"
         if not sqlfiles:
             sqlfiles = [
-                scriptspath + '{0}_bakup.sql'.format(dbname),
+                scriptspath + '{0}_backup.sql'.format(dbname),
                 scriptspath + '{0}.sql'.format(dbname),
                 scriptspath + 'configration.sql',
                 gitscriptpath + 'functionAndProcedure.sql'

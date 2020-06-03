@@ -3,7 +3,6 @@ batch import excels or csvs into mysql database in NeonCRM
 
 """
 
-import easygui
 import os
 import pymysql
 import re
