@@ -1,19 +1,15 @@
 """
-handle with config.ini
+get or set configuration from config.ini
 """
 
 import os
 import sys
+import configparser
 
 
 class HandleConfig:
 
-    def __init__(self):
-        pass
-
-    # handle config.ini
     def handle_config(self, option=None, section=None, key=None, value=None):
-        import configparser
         conf = configparser.ConfigParser()
         realpath = os.path.split(os.path.realpath(sys.argv[0]))[0]
         configini = realpath + r"\config.ini"
@@ -33,4 +29,5 @@ class HandleConfig:
 
         with open(configini, 'w') as fw:
             conf.write(fw)
+
         return conf

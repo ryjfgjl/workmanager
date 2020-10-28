@@ -1,72 +1,69 @@
+
 """
 Dump mysql
 """
 
-import PySimpleGUI as sg
 import shutil
-from datetime import datetime
 from common.handleconfig import HandleConfig
 from common.conndb import ConnDB
-import gzip,os
+import gzip
+import os
+import PySimpleGUI as sg
 
-sg.ChangeLookAndFeel('GreenTan')
 
 class MysqlDump:
 
     def __init__(self):
-
         self.HandleConfig = HandleConfig()
         self.ConnDB = ConnDB()
 
-    def main(self, currentwork):
+    def main(self, currentwork, advanced=0, gz=False, after=0, op='mysqldump-no-r'):
+        jirapath = self.HandleConfig.handle_config('g', currentwork, 'jirapath')
+        dbname = self.HandleConfig.handle_config('g', currentwork, 'dbname')
+        sqlname = '{0}.sql'.format(dbname)
+        sqlfile = jirapath + 'script\\' + sqlname
+        if after:
+            sqlfile = jirapath + 'script\\' + '{0}_after.sql'.format(dbname)
+        if not op:
+            op = 'mysqldump-no-r'
+        tablesname = ''
 
-        jirapath = self.HandleConfig.handle_config("g", currentwork, "jirapath")
-        dbname = self.HandleConfig.handle_config("g", currentwork, "dbname")
-
-        layout = [
-            [sg.Text('Database Name')],
-            [sg.InputText('{0}'.format(dbname), key='dbname')],
-            [sg.Text('Gzip?')],
-            [sg.Radio('Yes', 'R0', key='y'), sg.Radio('No', 'R0', default=True, key='n')],
-            [sg.Submit(tooltip='Click to submit this form'), sg.Cancel()]
-        ]
-        window = sg.Window('', layout=layout, )
-        event, values = window.read()
-        window.close()
-
-        if event in (None, 'Cancel'):
-            return
-        dbname = values['dbname'].strip().lower()
-
-        if values['y']:
-            gz = True
-        else:
-            gz = False
-
-        sqlfile = '{0}.sql'.format(dbname)
-        op = "mysqldump-no-r"
+        if advanced:
+            layout = [
+                [sg.Text('Database Name: {0}'.format(dbname))],
+                [sg.Text('Tables Name:'), sg.InputText(key='tablesname')],
+                [sg.Text('File Name:'), sg.InputText(key='filename')],
+                [sg.Submit(tooltip='Click to submit this form'), sg.Cancel()]
+            ]
+            window = sg.Window('', layout=layout)
+            event, values = window.read()
+            window.close()
+            if event in (None, 'Cancel'):
+                return
+            tablesname = values['tablesname']
+            filename = values['filename']
+            if filename:
+                sqlfile = jirapath + 'script\\' + filename
 
         if gz:
-            sqlfile = jirapath + "scripts_bak\\" + sqlfile
-            sqlfile_gzip = jirapath + "\\scripts_bak\\{0}.sql.gz".format(dbname)
+            sqlfile = jirapath + 'db_backup\\' + sqlname
+            sqlfile_gzip = jirapath + '\\db_backup\\{0}.sql.gz'.format(dbname)
             op = 'mysqldump'
             ret = self.ConnDB.cmd(dbname, op, sqlfile)
             if ret == 0:
-                with open(sqlfile, 'rb') as f_in, gzip.open(sqlfile_gzip, 'wb') as f_out:
-                    shutil.copyfileobj(f_in, f_out)
+                with open(sqlfile, 'rb') as (f_in):
+                    with gzip.open(sqlfile_gzip, 'wb') as (f_out):
+                        shutil.copyfileobj(f_in, f_out)
                 os.remove(sqlfile)
-
         else:
-            sqlfile = jirapath + "scripts\\" + sqlfile
-            ret = self.ConnDB.cmd(dbname, op, sqlfile)
+            ret = self.ConnDB.cmd(dbname, op, sqlfile, tablesname)
             if ret == 0:
-                with open(sqlfile, "a") as fa:
-                    fa.write("COMMIT;")
-                now = datetime.now().strftime('%b-%d-%Y %H:%M:%S').replace(' ', '').replace(':', '')
-                newfile = jirapath + "\\scripts_bak\\{0}".format(dbname) + "_" + now + "_bak.sql"
-                shutil.copy(sqlfile, newfile)
+                with open(sqlfile, 'a') as (fa):
+                    fa.write('COMMIT;')
+            if advanced:
+                sg.Popup('Complete!')
 
-        if ret == 0:
-            sg.Popup('\n    Complete!         \n', )
-        else:
-            sg.Popup('\n    Error!         \n', )
+
+if '__name__' == '__main__':
+    MysqlDump = MysqlDump()
+    MysqlDump.main('')

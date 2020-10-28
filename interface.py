@@ -5,17 +5,16 @@ authorL zxb
 date:2020-05-19
 """
 
-Version = '1.0.1'
-
-# -------------------------- Program Interface -------------------------- #
+Version = '2.0'
 
 import PySimpleGUI as sg
 from common.handleconfig import HandleConfig
-import traceback
-import sys
+import traceback, sys, os
+import re
 
 HandleConfig = HandleConfig()
 sg.ChangeLookAndFeel('GreenTan')
+
 
 def exception_format():
     """
@@ -25,104 +24,193 @@ def exception_format():
         sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2]
     ))
 
+def generate_layout():
+    # get the work that the program is working on
+    works = [work for work in HandleConfig.handle_config()['worklist'].values()]
 
-while True:
-    try:
-        currentwork = HandleConfig.handle_config("g", "global", "currentwork")
+    # the setting of tool
+    # addvanced options
+    menu_def = [
+                ['&File', ['&Open Work Dir', '&Open Git Dir', '&Open tmp.txt']],
+                ['&Setting', ['&Edit Config', '&Load Config']],
+                ['&Tools', ['&Clean Sql', '&Custom Field']],
+                ['&Advanced', ['&Import Specific Excel','&Add Comment']],
+                ]
 
-        menu_def = [['&Setting', ['&Edit Config', '&Load Config', '&Check Update']]]
-        layout = [
-            [sg.Menu(menu_def, tearoff=True)],
-            [sg.Text('{0}Curent Work: {1}'.format(' '*50,currentwork), text_color='blue', font=15)],
-            [sg.Text(' ' * 160)],
-            [sg.Button(button_text='New Work', size=(15, 3)),
-             sg.Button(button_text='Import Excel', size=(15, 3), ), sg.Text(' ' * 40),
-             ],
-
-            [sg.Button(button_text='Dump Mysql', size=(15, 3)),
-             sg.Button(button_text='Restore Mysql', size=(15, 3)), sg.Text(' ' * 20),
-             sg.Button(button_text='Delete Work', size=(15, 3)),
-             sg.Button(button_text='db_to_download', size=(15, 3))],
-
-            [sg.Button(button_text='Configure Script', size=(15, 3)),
-             sg.Button(button_text='Run Script', size=(15, 3)), sg.Text(' ' * 20),
-             sg.Button(button_text='Refresh Git', size=(15, 3)), sg.Button(button_text='Generate Command', size=(15, 3))],
-            [sg.Text('-' * 160)],
+    # the templete layout
+    tab_layouts = []
+    for work in works:
+        try:
+            dbname = HandleConfig.handle_config("g", work, "dbname")
+        except:
+            dbname = ''
+        tab_layout = [
+            #[sg.Text('',size=(12,1))],
             [
-             sg.Button(button_text='Change Work', size=(15, 5)), sg.Text(' ' * 90),
-             sg.Button(button_text='Quit', size=(10, 5))],
+             sg.B(button_text='Import Excel', size=(15, 3), ),
+             sg.B(button_text='Config Import', size=(15, 3)),
+             sg.B(button_text='Restore Database', size=(15, 3)),
+             sg.B(button_text='Run Script', size=(15, 3)),
+             sg.B(button_text='Complete', size=(15, 3)),
 
+             ],
+            [sg.B(button_text='DB To Download', size=(15, 3)),
+             sg.B(button_text='AWS Command List', size=(15, 3))],
+            [
+                sg.Frame('Work Information',
+                         [
+                             [sg.Text('Database: '), sg.Input('{}'.format(dbname), disabled=True)],
+                             [sg.Text('Jira url: '), sg.Input('https://neoncrm.atlassian.net/browse/{}'.format(work), disabled=True)],
+                             [sg.Text('Test url: '), sg.Input('https://neonuat.com:8443/np/clients/{}_test/login.jsp'.format(dbname), disabled=True, size=(80, 1))],
+                         ], size=(1000, 5000))
+            ]
         ]
-        window = sg.Window('Work Manger {0}'.format(Version),
-                           layout,
-                           location=(1000, 100)
-                           )
+        tab_layouts.append(sg.Tab(work, tab_layout))
+
+    layout = [
+
+        [sg.Menu(menu_def)],
+        [sg.Button('New Work'), sg.Button('Git Pull'), sg.Text(' '*118), sg.Button('{}'.format(HandleConfig.handle_config('g', 'global', 'server')))],
+        [sg.TabGroup([tab_layouts])],
+    ]
+    return layout
+
+
+window = sg.Window('Work Manager {0}'.format(Version), generate_layout(), location=(700, 100))
+
+# A loop program until press X
+while True:
+    currentwork = None
+    try:
+
         event, values = window.read()
 
-        if event in (None, 'Quit'):
+        # when press X, quit the program
+        if event is None:
             break
+        elif event != 'cd188':
+            event = re.sub(r'\d+$', '', event)
+            currentwork = [value for value in values.values()][-1]
 
         if event == 'New Work':
             from events.newwork import NewWork
             NewWork = NewWork()
-            NewWork.main()
+            ret = 1
+            try:
+                ret = NewWork.main()
+            except:
+                raise
+            finally:
+                if ret != 0:
+                    window.close()
+                    window = sg.Window('Work Manager {0}'.format(Version), generate_layout(), location=(700, 100))
+
         elif event == 'Import Excel':
+            os.system('cls')
+            print('{:-^60}'.format(event))
             from events.excelimporter import ImportExcel
             ImportExcel = ImportExcel()
             ImportExcel.main(currentwork)
-        elif event == 'Dump Mysql':
-            from events.mysqldump import MysqlDump
-            MysqlDump = MysqlDump()
-            MysqlDump.main(currentwork)
-        elif event == 'Restore Mysql':
-            from events.mysqlrestore import MysqlRestore
-            MysqlRestore = MysqlRestore()
-            MysqlRestore.main(currentwork)
-        elif event == 'Configure Script':
+        elif event == 'Import Specific Excel':
+            os.system('cls')
+            print('{:-^60}'.format(event))
+            from events.excelimporter import ImportExcel
+            ImportExcel = ImportExcel()
+            ImportExcel.main(currentwork, advanced=1)
+        elif event == 'Config Import':
+            os.system('cls')
+            print('{:-^60}'.format(event))
             from events.configurescript import ConfigScript
             ConfigScript = ConfigScript()
             ConfigScript.main(currentwork)
+        elif event == 'Restore Database':
+            os.system('cls')
+            print('{:-^60}'.format(event))
+            from events.mysqlrestore import MysqlRestore
+            MysqlRestore = MysqlRestore()
+            MysqlRestore.main(currentwork)
         elif event == 'Run Script':
+            os.system('cls')
+            print('{:-^60}'.format(event))
             from events.runscript import RunScript
             RunScript = RunScript()
             RunScript.main(currentwork)
-        elif event == 'db_to_download':
+        elif event == 'DB To Download':
             from events.dbtodownload import DbToDownload
             DbToDownload = DbToDownload()
             DbToDownload.main(currentwork)
-        elif event == 'Change Work':
-            from events.changework import ChangeWork
-            ChangeWork = ChangeWork()
-            ChangeWork.main()
-        elif event == 'Delete Work':
+        elif event == 'Complete':
+            os.system('cls')
+            print('{:-^60}'.format(event))
             from events.deletework import DeleteWork
             DeleteWork = DeleteWork()
-            DeleteWork.main(currentwork)
-        elif event == 'Refresh Git':
-            from events.refreshgit import RefreshGit
-            RefreshGit = RefreshGit()
-            RefreshGit.main()
-        elif event == 'Generate Command':
+            ret = 1
+            try:
+                ret = DeleteWork.main(currentwork)
+            except:
+                raise
+            finally:
+                if ret != 0:
+                    window.close()
+                    window = sg.Window('Work Manager {0}'.format(Version), generate_layout(), location=(700, 100))
+
+        elif event == 'AWS Command List':
             from events.generatecmd import GenerateCMD
             GenerateCMD = GenerateCMD()
             GenerateCMD.main(currentwork)
+
+        elif event == 'Git Pull':
+            from tools.refreshgit import RefreshGit
+            RefreshGit = RefreshGit()
+            RefreshGit.main()
+
+        # Tools    
+        elif event == 'Clean Sql':
+            from tools.cleansql import CleanSql
+            CleanSql = CleanSql()
+            CleanSql.main()
+        elif event == 'Custom Field':
+            from tools.customfield import CustomField
+            CustomField = CustomField()
+            CustomField.main()
+        elif event == 'Add Comment':
+            from tools.addcomment import AddComment
+            AddComment = AddComment()
+            AddComment.main(currentwork)
+
+        # Setting        
         elif event == 'Edit Config':
-            from events.config import Config
-            Config = Config()
-            Config.edit_config()
+            from events.setting import Setting
+            Setting = Setting()
+            Setting.edit_config()
         elif event == 'Load Config':
-            from events.config import Config
-            Config = Config()
-            Config.load_config()
-        elif event == 'Check Update':
-            from events.checkupdate import CheckUpdate
-            CheckUpdate = CheckUpdate()
-            CheckUpdate.main(Version)
+            from events.setting import Setting
+            Setting = Setting()
+            Setting.load_config()
+        elif event in ('cd188', 'localhost'):
+            from events.setting import Setting
+            Setting = Setting()
+            Setting.swich_server(event)
+            window.close()
+            window = sg.Window('Work Manager {0}'.format(Version), generate_layout(), location=(700, 100))
+
+        # File
+        elif event == 'Open Work Dir':
+            from events.file import File
+            File = File()
+            File.open_work_dir(currentwork)
+        elif event == 'Open Git Dir':
+            from events.file import File
+            File = File()
+            File.open_git_dir()
+        elif event == 'Open tmp.txt':
+            from events.file import File
+            File = File()
+            File.open_tmp(currentwork)
 
     except:
-        sg.PopupError(exception_format())
+        # display the any program error
+        sg.PopupError(exception_format(), title=currentwork)
 
-    finally:
-        window.close()
 
 

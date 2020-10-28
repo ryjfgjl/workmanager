@@ -1,10 +1,14 @@
+
 from common.handleconfig import HandleConfig
 from common.conndb import ConnDB
 import PySimpleGUI as sg
 import shutil
+import re
 from events.mysqlrestore import MysqlRestore
-
-sg.ChangeLookAndFeel('GreenTan')
+from events.mysqldump import MysqlDump
+from collections import defaultdict
+from events.download import Download
+from datetime import date
 
 
 class ConfigScript:
@@ -12,99 +16,100 @@ class ConfigScript:
     def __init__(self):
         self.HandleConfig = HandleConfig()
         self.MysqlRestore = MysqlRestore()
+        self.MysqlDump = MysqlDump()
+        self.Download = Download()
         self.ConnDB = ConnDB()
         self.conn = self.ConnDB.conndb()
 
     def main(self, currentwork):
-        jirapath = self.HandleConfig.handle_config("g", currentwork, "jirapath")
-        jiraname = self.HandleConfig.handle_config("g", currentwork, "jiraname")
-        # dbname = self.HandleConfig.handle_config("g", currentwork, "dbname")
-        # scriptspath = jirapath + "scripts\\"
-        git_repo_path = self.HandleConfig.handle_config("g", "defaultpath", "git_repo_path")
+        jirapath = self.HandleConfig.handle_config('g', currentwork, 'jirapath')
+        jiraname = self.HandleConfig.handle_config('g', currentwork, 'jiraname')
+        git_repo_path = self.HandleConfig.handle_config('g', 'defaultpath', 'git_repo_path')
         gitscriptpath = git_repo_path + 'dataImportScript\\script\\'
         configration_sql = gitscriptpath + 'configration.sql'
-        configration_sql_new = jirapath + 'scripts\\configration.sql'
-        shutil.copy(configration_sql, configration_sql_new)
+        configration_sql_new = jirapath + 'script\\configration.sql'
+        # read local configration.sql
+        with open(configration_sql_new, 'r', encoding='utf8') as (fa):
+            lines = fa.readlines()
+        idx_s = lines.index('# Custom Conigurations Start\n')
+        idx_e = lines.index('# Custom Conigurations End\n')
+        config_lines = lines[idx_s+1:idx_e]
+        layout = []
+        option_dict = defaultdict()
+        idx = 0
+        for line in config_lines:
+            if not re.match('^INSERT INTO z_newcreate_data_import_config', line, re.IGNORECASE):
+                continue
+            s = line.split('(')
+            k = s[2].split(',')[0].replace("'", '').strip()
+            d = s[2].split(',')[1].replace("'", '').replace(')', '').replace(';', '').replace('#', '').strip()
+            option_dict[k] = ''
 
-        k0 = 'Wipe Data And Keep Settings'
-        k1 = 'Standardize Household Name And Household Salutation'
-        k2 = 'Account De-dupe Rule'
-        k3 = 'Retain Account Logic in duping'
-        k4 = 'De-Dupe address using standard script'
-        k5 = 'Merge Duplicate Accounts even if they are in the Same Company'
-        k6 = 'Merge Duplicate Accounts even if they are in the Same Household'
-        k7 = 'Merge households if one account is head in household, but is non-head in another'
-        k8 = 'Merge Duplicate Accounts even if they have relationships to each other'
-        k9 = 'Change Drop Down Custom Field To Checkbox If Multiple Options Are Selected'
-        k10 = 'Drop down custom fieldId that should not be changed to checkbox'
-        k11 = 'Legacy Account Custom Field Name'
+            if len(s) > 3:
+                # dropdown
+                options = s[3:]
+                option_dict[k] = '#(' + '('.join(options)
+                for i in range(len(options)):
+                    options[i] = options[i].replace("'", '').replace(')', '').replace('\n', '').replace(',', '')
+                lay = [
+                 sg.Text(k), sg.Combo(options, default_value=d, key=k)]
+            else:
+                # oneline text
+                if re.match('^Legacy Account Custom Field Name', k, re.IGNORECASE):
+                    k = 'Legacy Account Custom Field Name' + str(idx)
+                    idx+=1
+                option_dict[k] = ''
+                lay = [sg.Text(k), sg.InputText(d, key=k)]
+            layout.append(lay)
 
-        layout = [
-            [sg.Text(k0), sg.Combo(['Yes', 'No'], default_value='No', key=k0)],
-            [sg.Text(k1), sg.Combo(('Yes', 'No'), default_value='Yes', key=k1)],
-            [sg.Text(k2), sg.Combo(('Name + Email/Address Match', 'Name Match', 'Name + Email Match', 'Name + Address Match', 'Do Not De-Dupe'), default_value='Name + Email/Address Match', key=k2)],
-            [sg.Text(k3), sg.Combo(('Smallest ID', 'Biggest ID', 'Earliest Create Time', 'Most Recent Create Time', 'Others'), default_value='Smallest ID', key=k3)],
-            [sg.Text(k4), sg.Combo(('Yes', 'No'), default_value='Yes', key=k4)],
-            [sg.Text(k5), sg.Combo(('Yes', 'No'), default_value='Yes', key=k5)],
-            [sg.Text(k6), sg.Combo(('Yes', 'No'), default_value='Yes', key=k6)],
-            [sg.Text(k7), sg.Combo(('Yes', 'No'), default_value='Yes', key=k7)],
-            [sg.Text(k8), sg.Combo(('Yes', 'No'), default_value='Yes', key=k8)],
-            [sg.Text(k9), sg.Combo(('Yes', 'No'), default_value='Yes', key=k9)],
-            [sg.Text(k10), sg.InputText('', key=k10)],
-            [sg.Text(k11), sg.InputText('Legacy ID', key=k11)],
-            [sg.Submit(tooltip='Click to submit this form'), sg.Cancel()]
-        ]
-        window = sg.Window('', layout)
+        layout.append([sg.Submit(), sg.Cancel(),sg.Button('Git Configration.sql')])
+        window = sg.Window(title=currentwork, layout=layout)
         event, values = window.read()
         window.close()
         if event in (None, 'Cancel'):
             return
+
+        # copy configration.sql from git repo
+        # relace new config into configration.sql
+        shutil.copy(configration_sql, configration_sql_new)
+        if event == 'Git Configration.sql': 
+            return
+            
         li = []
         sql_pre = 'INSERT INTO z_newcreate_data_import_config(taskName,taskValue) VALUES('
+
         for key, value in values.items():
-            if value == '':
-                value = 'NULL'
-            sql = sql_pre + '"' + key + '",' + '"' + value + '");\n'
+            key_true = key
+            if re.match('^Legacy Account Custom Field Name', key, re.IGNORECASE):
+                key_true = 'Legacy Account Custom Field Name'
+            if key == 'Work Start Date':
+                if value == '':
+                    value = str(date.today())
+            sql = sql_pre + "'" + key_true + "'," + "'" + value + "');" + option_dict[key] + '\n'
             li.append(sql)
-        with open(configration_sql_new, 'r', encoding='utf8') as fa:
+        with open(configration_sql, 'r', encoding='utf8') as (fa):
             lines = fa.readlines()
         idx_s = lines.index('# Custom Conigurations Start\n')
         idx_e = lines.index('# Custom Conigurations End\n')
-        lines_new = lines[:idx_s+1] + li + lines[idx_e:]
-        with open(configration_sql_new, 'w', encoding='utf8') as fw:
+        lines_new = lines[:idx_s + 1] + li + lines[idx_e:]
+        with open(configration_sql_new, 'w', encoding='utf8') as (fw):
             fw.writelines(lines_new)
         merge = 'True'
-        if values[k2] == 'Do Not De-Dupe':
+        if values['Account De-dupe Rule'] == 'No De-dupe':
             merge = 'False'
-        self.HandleConfig.handle_config("s", jiraname, "merge", merge)
-        self.MysqlRestore.main(currentwork)
+        self.HandleConfig.handle_config('s', jiraname, 'merge', merge)
+
+        # download database
+        if values['Pull Database From AWS'] == 'Yes':
+            self.Download.main(currentwork)
+        # restore
+        self.MysqlRestore.main(currentwork, advanced=0)
+        # dump to dbname_after
+        self.MysqlDump.main(currentwork, after=1, op='mysqldump')
+
+        sg.Popup('Config Complete!', title=currentwork)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+if '__name__' == '__main__':
+    ConfigScript = ConfigScript()
+    ConfigScript.main('')
