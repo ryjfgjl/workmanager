@@ -34,6 +34,7 @@ class MysqlRestore:
         tmpscript = scriptspath + 'tmp.txt'
         script = navicat_script_path + dbname + '\\{}.sql'.format(dbname)
         backupsql = scriptspath + '{0}_after.sql'.format(dbname)
+        excel_sql_file = scriptspath + '{0}.sql'.format(dbname)
 
         # truncate tmp.txt first
         with open(tmpscript, 'w', encoding='utf8') as (fw):
@@ -93,6 +94,7 @@ class MysqlRestore:
 
                  [sg.Checkbox('AllScriptWithoutSmokeTest', key='AllScriptWithoutSmokeTest')],
 
+                 [sg.Checkbox('ExcelSqlFile', key=excel_sql_file)],
                  [sg.Checkbox('TemplateScript', key=script)],
                  [sg.Checkbox('TemplateSmokeTest', key='TemplateSmokeTest')],
                  [sg.Checkbox('TemplateScriptAfter', key=navicat_script_path + dbname + '\\{}_after_template.sql'.format(dbname))],

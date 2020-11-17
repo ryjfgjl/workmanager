@@ -22,11 +22,13 @@ class CleanSql:
         for i in range(10000000):
             try:
                 event, values = window.read()
+
                 sql_cleaned = ''
                 if event is None:
                     break
 
                 sql = values['i'].strip()
+                #window['o'].set_focus()
 
                 if len(sql) == 0:
                     continue
@@ -147,6 +149,7 @@ class CleanSql:
                 continue
             finally:
                 window['o'].update(sql_cleaned)
+
 
         window.close()
 

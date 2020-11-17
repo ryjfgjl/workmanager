@@ -2,35 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="76f0bfd3-aa85-4375-8129-d1146d6870ff" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/tools/refreshgit.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workmanager.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workmanager.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cat.ico" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/conndb.py" beforeDir="false" afterPath="$PROJECT_DIR$/common/conndb.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/handleconfig.py" beforeDir="false" afterPath="$PROJECT_DIR$/common/handleconfig.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/config.ini" beforeDir="false" afterPath="$PROJECT_DIR$/config.ini" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/events/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/events/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/events/changework.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/events/checkupdate.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/events/config.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/events/configurescript.py" beforeDir="false" afterPath="$PROJECT_DIR$/events/configurescript.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/events/dbtodownload.py" beforeDir="false" afterPath="$PROJECT_DIR$/events/dbtodownload.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/events/deletework.py" beforeDir="false" afterPath="$PROJECT_DIR$/events/deletework.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/events/excelimporter.py" beforeDir="false" afterPath="$PROJECT_DIR$/events/excelimporter.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/events/generatecmd.py" beforeDir="false" afterPath="$PROJECT_DIR$/events/generatecmd.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/events/gitscripts.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/events/mysqldump.py" beforeDir="false" afterPath="$PROJECT_DIR$/events/mysqldump.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/events/mysqlrestore.py" beforeDir="false" afterPath="$PROJECT_DIR$/events/mysqlrestore.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/events/newwork.py" beforeDir="false" afterPath="$PROJECT_DIR$/events/newwork.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/events/refreshgit.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/events/runscript.py" beforeDir="false" afterPath="$PROJECT_DIR$/events/runscript.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/interface.py" beforeDir="false" afterPath="$PROJECT_DIR$/interface.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/reference_files/1111.txt" beforeDir="false" afterPath="$PROJECT_DIR$/reference_files/1111.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/reference_files/cleanexcel.sql" beforeDir="false" afterPath="$PROJECT_DIR$/reference_files/cleanexcel.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/setup.py" beforeDir="false" afterPath="$PROJECT_DIR$/setup.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/test.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/workmanager.docx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tools/cleansql.py" beforeDir="false" afterPath="$PROJECT_DIR$/tools/cleansql.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -39,14 +14,14 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="FileEditorManager">
-    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+    <leaf>
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/events/setting.py">
+        <entry file="file://$PROJECT_DIR$/interface.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="357">
-              <caret line="21" column="32" selection-start-line="21" selection-start-column="32" selection-end-line="21" selection-end-column="32" />
+            <state relative-caret-position="136">
+              <caret line="8" lean-forward="true" selection-start-line="8" selection-end-line="8" />
               <folding>
-                <element signature="e#1#42#0" expanded="true" />
+                <element signature="e#70#94#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -68,6 +43,7 @@
       <find>self.use_server</find>
       <find>win32com</find>
       <find>’</find>
+      <find>int</find>
     </findStrings>
     <replaceStrings>
       <replace>HandleConfig</replace>
@@ -97,10 +73,8 @@
         <option value="$PROJECT_DIR$/events/refreshgit.py" />
         <option value="$PROJECT_DIR$/tools/customfield.py" />
         <option value="$PROJECT_DIR$/events/mysqldump.py" />
-        <option value="$PROJECT_DIR$/config.ini" />
         <option value="$PROJECT_DIR$/common/conndb.py" />
         <option value="$PROJECT_DIR$/tools/refreshgit.py" />
-        <option value="$PROJECT_DIR$/tools/cleansql.py" />
         <option value="$PROJECT_DIR$/events/file.py" />
         <option value="$PROJECT_DIR$/setup.py" />
         <option value="$PROJECT_DIR$/test.py" />
@@ -112,12 +86,14 @@
         <option value="$PROJECT_DIR$/tools/addcomment.py" />
         <option value="$PROJECT_DIR$/events/newwork.py" />
         <option value="$PROJECT_DIR$/events/deletework.py" />
-        <option value="$PROJECT_DIR$/interface.py" />
         <option value="$PROJECT_DIR$/events/setting.py" />
+        <option value="$PROJECT_DIR$/tools/cleansql.py" />
+        <option value="$PROJECT_DIR$/config.ini" />
+        <option value="$PROJECT_DIR$/interface.py" />
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
+  <component name="ProjectFrameBounds" extendedState="7">
     <option name="x" value="1" />
     <option name="width" value="1598" />
     <option name="height" value="991" />
@@ -130,7 +106,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -141,17 +116,13 @@
             <path>
               <item name="workmanager" type="b2602c69:ProjectViewProjectNode" />
               <item name="workmanager" type="462c0819:PsiDirectoryNode" />
-              <item name="events" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="workmanager" type="b2602c69:ProjectViewProjectNode" />
-              <item name="workmanager" type="462c0819:PsiDirectoryNode" />
               <item name="tools" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -285,6 +256,8 @@
       <workItem from="1600681281423" duration="60000" />
       <workItem from="1603421618047" duration="18552000" />
       <workItem from="1603780921823" duration="6806000" />
+      <workItem from="1603870860852" duration="147000" />
+      <workItem from="1604890971092" duration="10296000" />
     </task>
     <task id="LOCAL-00001" summary="initial commit">
       <created>1589870089051</created>
@@ -346,17 +319,17 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="284491000" />
+    <option name="totallyTimeSpent" value="294934000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.12579957" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.12793177" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32900432" />
-      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49840087" weight="0.16450216" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49840087" weight="0.21212122" />
       <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.49946696" weight="0.39935064" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -408,7 +381,7 @@
     <option name="LAST_COMMIT_MESSAGE" value="initial commits" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/workmanager$interface.coverage" NAME="interface Coverage Results" MODIFIED="1603788486791" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/workmanager$interface.coverage" NAME="interface Coverage Results" MODIFIED="1604908987892" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/workmanager$test.coverage" NAME="test Coverage Results" MODIFIED="1603434786781" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
   <component name="editorHistoryManager">
@@ -442,13 +415,6 @@
           <folding>
             <element signature="e#44#68#0" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/config.ini">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="408">
-          <caret line="24" column="11" lean-forward="true" selection-start-line="24" selection-start-column="11" selection-end-line="24" selection-end-column="11" />
         </state>
       </provider>
     </entry>
@@ -509,16 +475,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/events/changework.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="187">
-          <caret line="11" column="8" selection-start-line="11" selection-start-column="8" selection-end-line="11" selection-end-column="89" />
-          <folding>
-            <element signature="e#1#45#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/events/changework.py" />
     <entry file="file://$PROJECT_DIR$/events/download.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="306">
@@ -583,16 +540,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/tools/cleansql.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="644">
-          <caret line="147" column="20" selection-start-line="147" selection-start-column="20" selection-end-line="147" selection-end-column="20" />
-          <folding>
-            <element signature="e#44#68#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/events/newwork.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="595">
@@ -623,22 +570,39 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/interface.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="34">
-          <caret line="155" lean-forward="true" selection-start-line="155" selection-end-line="155" />
-          <folding>
-            <element signature="e#70#94#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/events/setting.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="357">
           <caret line="21" column="32" selection-start-line="21" selection-start-column="32" selection-end-line="21" selection-end-column="32" />
           <folding>
             <element signature="e#1#42#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tools/cleansql.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="408">
+          <caret line="30" column="40" lean-forward="true" selection-start-line="30" selection-start-column="40" selection-end-line="30" selection-end-column="40" />
+          <folding>
+            <element signature="e#44#68#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/config.ini">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="663">
+          <caret line="39" column="10" lean-forward="true" selection-start-line="39" selection-start-column="10" selection-end-line="39" selection-end-column="10" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/interface.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="136">
+          <caret line="8" lean-forward="true" selection-start-line="8" selection-end-line="8" />
+          <folding>
+            <element signature="e#70#94#0" expanded="true" />
           </folding>
         </state>
       </provider>

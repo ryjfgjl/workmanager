@@ -5,7 +5,7 @@ authorL zxb
 date:2020-05-19
 """
 
-Version = '2.0'
+Version = '2.1'
 
 import PySimpleGUI as sg
 from common.handleconfig import HandleConfig
@@ -71,16 +71,20 @@ def generate_layout():
 
         [sg.Menu(menu_def)],
         [sg.Button('New Work'), sg.Button('Git Pull'), sg.Text(' '*118), sg.Button('{}'.format(HandleConfig.handle_config('g', 'global', 'server')))],
-        [sg.TabGroup([tab_layouts])],
+        [sg.TabGroup([tab_layouts], selected_background_color='red', key='tabgroup')],
     ]
     return layout
 
 
 window = sg.Window('Work Manager {0}'.format(Version), generate_layout(), location=(700, 100))
+window.Finalize()
+currentwork = HandleConfig.handle_config('g','global','currentwork')
+if currentwork:
+    window[currentwork].Select()
 
 # A loop program until press X
 while True:
-    currentwork = None
+    #currentwork = None
     try:
 
         event, values = window.read()
@@ -104,6 +108,9 @@ while True:
                 if ret != 0:
                     window.close()
                     window = sg.Window('Work Manager {0}'.format(Version), generate_layout(), location=(700, 100))
+                    window.Finalize()
+                    currentwork = HandleConfig.handle_config('g', 'global', 'currentwork')
+                    window[currentwork].Select()
 
         elif event == 'Import Excel':
             os.system('cls')
@@ -153,6 +160,9 @@ while True:
                 if ret != 0:
                     window.close()
                     window = sg.Window('Work Manager {0}'.format(Version), generate_layout(), location=(700, 100))
+                    window.Finalize()
+                    currentwork = HandleConfig.handle_config('g', 'global', 'currentwork')
+                    window[currentwork].Select()
 
         elif event == 'AWS Command List':
             from events.generatecmd import GenerateCMD
@@ -191,8 +201,12 @@ while True:
             from events.setting import Setting
             Setting = Setting()
             Setting.swich_server(event)
+            currentwork = window['tabgroup'].get()
             window.close()
             window = sg.Window('Work Manager {0}'.format(Version), generate_layout(), location=(700, 100))
+            window.Finalize()
+            if currentwork:
+                window[currentwork].Select()
 
         # File
         elif event == 'Open Work Dir':
@@ -211,6 +225,9 @@ while True:
     except:
         # display the any program error
         sg.PopupError(exception_format(), title=currentwork)
+    finally:
+        if currentwork:
+            HandleConfig.handle_config('s', 'global', 'currentwork', currentwork)
 
 
 
