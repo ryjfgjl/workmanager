@@ -12,6 +12,7 @@ from common.handleconfig import HandleConfig
 import traceback, sys, os
 import re
 
+
 HandleConfig = HandleConfig()
 sg.ChangeLookAndFeel('GreenTan')
 
@@ -76,7 +77,7 @@ def generate_layout():
     return layout
 
 
-window = sg.Window('Work Manager {0}'.format(Version), generate_layout(), location=(700, 100))
+window = sg.Window('Work Manager {0}'.format(Version), generate_layout(), location=(700, 100), finalize=True)
 window.Finalize()
 currentwork = HandleConfig.handle_config('g','global','currentwork')
 if currentwork:
@@ -118,6 +119,7 @@ while True:
             from events.excelimporter import ImportExcel
             ImportExcel = ImportExcel()
             ImportExcel.main(currentwork)
+
         elif event == 'Import Specific Excel':
             os.system('cls')
             print('{:-^60}'.format(event))
@@ -136,6 +138,7 @@ while True:
             from events.mysqlrestore import MysqlRestore
             MysqlRestore = MysqlRestore()
             MysqlRestore.main(currentwork)
+
         elif event == 'Run Script':
             os.system('cls')
             print('{:-^60}'.format(event))

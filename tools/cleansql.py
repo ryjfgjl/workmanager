@@ -20,20 +20,20 @@ class CleanSql:
         window = sg.Window(title='Sql Cleaner', layout=layout)
 
         for i in range(10000000):
-            try:
-                event, values = window.read()
+            event, values = window.read()
 
-                sql_cleaned = ''
-                if event is None:
-                    break
+            sql_cleaned = ''
+            if event is None:
+                break
 
-                sql = values['i'].strip()
-                #window['o'].set_focus()
+            sql = values['i'].strip()
+            # window['o'].set_focus()
 
-                if len(sql) == 0:
-                    continue
+            if len(sql) == 0:
+                continue
 
-                if event == 'Clean':
+            if event == 'Clean':
+                try:
                     # parse sql
                     tokens = sqlparse.parse(sql)[0].tokens
                     insert = ''
@@ -43,6 +43,7 @@ class CleanSql:
                     parse_insert = True
                     parse_select = False
                     parse_from = False
+
                     for token in tokens:
                         value = token.value
                         vtype = str(type(token))
@@ -62,6 +63,8 @@ class CleanSql:
                             elif vtype == "<class 'sqlparse.sql.IdentifierList'>":
                                 for field in token.get_identifiers():
                                     fields.append(field.value)
+                            elif ttype == "Token.Name.Builtin":
+                                fields.append(value)
                             elif ttype == 'Token.Keyword' and value.upper() == 'FROM':
                                 parse_from = True
                                 parse_select = False
@@ -139,16 +142,17 @@ class CleanSql:
                         select_cleaned = select_cleaned + select[0] + ' ' + ','.join(select[1:-1]) + select[-1] + '\n'
 
                     sql_cleaned = insert_cleaned + '\n' + select_cleaned
+                except Exception as reason:
+                    sg.popup_error(reason)
+                    continue
+                finally:
+                    window['o'].update(sql_cleaned)
 
-                if event == 'Copy':
-                    sql_cleaned = values['o'].strip()
-                    pyperclip.copy(sql_cleaned)
+            if event == 'Copy':
+                sql_cleaned = values['o'].strip()
+                pyperclip.copy(sql_cleaned)
 
-            except Exception as reason:
-                sg.popup_error(reason)
-                continue
-            finally:
-                window['o'].update(sql_cleaned)
+
 
 
         window.close()

@@ -184,29 +184,18 @@ class MysqlRestore:
             ret = self.ConnDB.exec(conn, sql)
             result = ret.fetchall()
             if len(result) > 0:
-                layout = [[sg.Text('Somke Test Result is not empty! Check it first!\n\n Press OK to continue to dump database and upload to winscp.')],
-                    [sg.OK(),sg.Cancel(), sg.Button('Check Out')]
-                ]
-                window = sg.Window(title=currentwork, layout=layout)
-                event, values = window.read()
-                window.close()
-
-                if event in ('Cancel', None):
-                    return
-
-                if event == 'Check Out':
-                    layout = [
+                layout = [
                     [sg.Table(result,
-                        ['errorMsg', 'Error Count After', 'Error Count Pre', 'Pass Flag'], col_widths=[100,15,15,15], auto_size_columns=False, justification="left")
+                        ['errorMsg', 'Error Count After', 'Error Count Pre', 'Pass Flag'], col_widths=[60,15,15,15], auto_size_columns=False, justification="left")
                     ],
                         [sg.Text('Press OK to continue to dump database and upload to winscp.')],
                         [sg.OK(),sg.Cancel()]
                     ]
-                    window1 = sg.Window(title=currentwork, layout=layout)
-                    event1, values = window1.read()
-                    window1.close()
-                    if event1 in ('Cancel', None):
-                        return
+                window = sg.Window(title=currentwork, layout=layout)
+                event, values = window.read()
+                window.close()
+                if event in ('Cancel', None):
+                    return
             self.MysqlDump.main(currentwork, gz=True)
             winscppath = self.HandleConfig.handle_config('g', 'defaultpath', 'winscppath')
             db_backup = self.HandleConfig.handle_config('g', currentwork, 'jirapath') + 'db_backup\\{0}.sql.gz'.format(dbname)

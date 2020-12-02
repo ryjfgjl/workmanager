@@ -37,30 +37,46 @@ class ConfigScript:
         layout = []
         option_dict = defaultdict()
         idx = 0
+        frame = []
+        title = ''
+        titles = defaultdict()
+        title_idx = 0
         for line in config_lines:
-            if not re.match('^INSERT INTO z_newcreate_data_import_config', line, re.IGNORECASE):
-                continue
-            s = line.split('(')
-            k = s[2].split(',')[0].replace("'", '').strip()
-            d = s[2].split(',')[1].replace("'", '').replace(')', '').replace(';', '').replace('#', '').strip()
-            option_dict[k] = ''
+            if re.match('^#Flag ', line):
+                if frame:
+                    lay = [sg.Frame(layout=frame, title=title, title_color='blue')]
+                    layout.append(lay)
+                title = line.split('#Flag')[-1].strip()
+                frame = []
+                titles[title_idx] = '#Flag ' + title + '\n'
 
-            if len(s) > 3:
-                # dropdown
-                options = s[3:]
-                option_dict[k] = '#(' + '('.join(options)
-                for i in range(len(options)):
-                    options[i] = options[i].replace("'", '').replace(')', '').replace('\n', '').replace(',', '')
-                lay = [
-                 sg.Text(k), sg.Combo(options, default_value=d, key=k)]
-            else:
-                # oneline text
-                if re.match('^Legacy Account Custom Field Name', k, re.IGNORECASE):
-                    k = 'Legacy Account Custom Field Name' + str(idx)
-                    idx+=1
+            elif re.match('^INSERT INTO z_newcreate_data_import_config', line, re.IGNORECASE):
+                s = line.split('(')
+                k = s[2].split(',')[0].replace("'", '').strip()
+                d = s[2].split(',')[1].replace("'", '').replace(')', '').replace(';', '').replace('#', '').strip()
                 option_dict[k] = ''
-                lay = [sg.Text(k), sg.InputText(d, key=k)]
+
+                if len(s) > 3:
+                    # dropdown
+                    options = s[3:]
+                    option_dict[k] = '#(' + '('.join(options)
+                    for i in range(len(options)):
+                        options[i] = options[i].replace("'", '').replace(')', '').replace('\n', '').replace(',', '')
+                    lay = [
+                     sg.Text(k), sg.Combo(options, default_value=d, key=k)]
+                else:
+                    # oneline text
+                    if re.match('^Legacy Account Custom Field Name', k, re.IGNORECASE):
+                        k = 'Legacy Account Custom Field Name' + str(idx)
+                        idx+=1
+                    option_dict[k] = ''
+                    lay = [sg.Text(k), sg.InputText(d, key=k)]
+                frame.append(lay)
+                title_idx+=1
+        if frame:
+            lay = [sg.Frame(layout=frame, title=title, title_color='blue')]
             layout.append(lay)
+
 
         layout.append([sg.Submit(), sg.Cancel(),sg.Button('Git Configration.sql')])
         window = sg.Window(title=currentwork, layout=layout)
@@ -74,10 +90,10 @@ class ConfigScript:
         shutil.copy(configration_sql, configration_sql_new)
         if event == 'Git Configration.sql': 
             return
-            
         li = []
         sql_pre = 'INSERT INTO z_newcreate_data_import_config(taskName,taskValue) VALUES('
-
+        i = 0
+        print(titles)
         for key, value in values.items():
             key_true = key
             if re.match('^Legacy Account Custom Field Name', key, re.IGNORECASE):
@@ -86,7 +102,11 @@ class ConfigScript:
                 if value == '':
                     value = str(date.today())
             sql = sql_pre + "'" + key_true + "'," + "'" + value + "');" + option_dict[key] + '\n'
+            if i in titles.keys():
+                li.append(titles[i])
             li.append(sql)
+
+            i += 1
         with open(configration_sql, 'r', encoding='utf8') as (fa):
             lines = fa.readlines()
         idx_s = lines.index('# Custom Conigurations Start\n')
