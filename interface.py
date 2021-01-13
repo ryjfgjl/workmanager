@@ -5,7 +5,7 @@ authorL zxb
 date:2020-05-19
 """
 
-Version = '2.1'
+Version = '2.3'
 
 import PySimpleGUI as sg
 from common.handleconfig import HandleConfig
@@ -32,10 +32,10 @@ def generate_layout():
     # the setting of tool
     # addvanced options
     menu_def = [
-                ['&File', ['&Open Work Dir', '&Open Git Dir', '&Open tmp.txt']],
+                ['&File', ['&Open Work Dir', '&Open Git Dir', '&Open tmp.txt', '&Append Templete Scripts']],
                 ['&Setting', ['&Edit Config', '&Load Config']],
                 ['&Tools', ['&Clean Sql', '&Custom Field']],
-                ['&Advanced', ['&Import Specific Excel','&Add Comment']],
+                ['&Advanced', ['&Import Specific Excel','&Add Comment','&View Table']],
                 ]
 
     # the templete layout
@@ -60,9 +60,11 @@ def generate_layout():
             [
                 sg.Frame('Work Information',
                          [
-                             [sg.Text('Database: '), sg.Input('{}'.format(dbname), disabled=True)],
-                             [sg.Text('Jira url: '), sg.Input('https://neoncrm.atlassian.net/browse/{}'.format(work), disabled=True)],
-                             [sg.Text('Test url: '), sg.Input('https://neonuat.com:8443/np/clients/{}_test/login.jsp'.format(dbname), disabled=True, size=(80, 1))],
+                             [sg.Text('Database:',size=(7,1)),
+                             sg.Input('{}'.format(dbname), disabled=True, key=work+'_db', size=(25,1)),
+                              ],
+                             [sg.Text('Jira url: ',size=(7,1)), sg.Input('https://neoncrm.atlassian.net/browse/{}'.format(work), disabled=True, size=(50,1))],
+                             [sg.Text('Test url: ',size=(7,1)), sg.Input('https://neonuat.com:8443/np/clients/{}_test/login.jsp'.format(dbname), disabled=True, size=(70, 1))],
                          ], size=(1000, 5000))
             ]
         ]
@@ -190,6 +192,10 @@ while True:
             from tools.addcomment import AddComment
             AddComment = AddComment()
             AddComment.main(currentwork)
+        elif event == 'View Table':
+            from tools.viewtable import ViewTable
+            ViewTable = ViewTable()
+            ViewTable.main(currentwork)
 
         # Setting        
         elif event == 'Edit Config':
@@ -224,6 +230,12 @@ while True:
             from events.file import File
             File = File()
             File.open_tmp(currentwork)
+        elif event == 'Append Templete Scripts':
+            from events.file import File
+            File = File()
+            File.append_templete_scripts(currentwork)
+
+
 
     except:
         # display the any program error

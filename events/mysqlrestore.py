@@ -59,6 +59,11 @@ class MysqlRestore:
                 gitscriptpath + 'smokeTestV2.sql'
             ]
 
+            # get b4_size
+            b4_size = os.path.getsize(backupgz)/1024/1024
+            b4_size = '{:.0f}'.format(b4_size)
+            self.HandleConfig.handle_config('s', currentwork, 'b4_size', b4_size)
+
         elif advanced == 1:
             # restore database
             msg = 'Restore Database Complete!'
@@ -115,7 +120,7 @@ class MysqlRestore:
             if event in (None, 'Cancel'):
                 return
 
-            
+
             if values['drop']:
                 drop = 1
             else:
@@ -136,6 +141,12 @@ class MysqlRestore:
                     files.remove(gitscriptpath + 'accountMerge.sql')
                 if values['AllScriptWithoutSmokeTest']:
                     files.remove(gitscriptpath + 'smokeTestV2.sql')
+
+                for k, v in values.items():
+                    if v:
+                        if k != 'AllScript' and k != 'AllScriptWithoutSmokeTest' and k != 'drop':
+                            sg.PopupError('Confict Selection!')
+                            return
 
 
             else:

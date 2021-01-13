@@ -10,7 +10,6 @@ from collections import defaultdict
 import numpy as np
 import pandas as pd
 import chardet
-from datetime import date, datetime
 
 from common.handleconfig import HandleConfig
 from common.conndb import ConnDB
@@ -26,7 +25,6 @@ class ImportExcel:
         self.MysqlDump = MysqlDump()
         self.cleansql = self.HandleConfig.handle_config('g', 'referencefile', 'cleanexcel')
         self.nickname = self.HandleConfig.handle_config('g', 'excelimporter', 'nickname')
-        self.indentify_col_name = 1
 
     def main(self, currentwork, advanced=0):
         self.dbname = self.HandleConfig.handle_config('g', currentwork, 'dbname')
@@ -81,12 +79,26 @@ class ImportExcel:
                     datasets = defaultdict()
                     csv = self.importexcelpath + '\\' + excelcsv
 
-                    with open(csv, 'rb') as f:
-                        bytes = f.read(1000000)
-                    encode = chardet.detect(bytes)['encoding']
-                    if encode == 'ascii':
-                        encode = 'ansi'
-                    dataset = pd.read_csv(csv, encoding=encode, dtype=str, na_values=na_values, keep_default_na=False, header=0, engine='c')
+                    # Determining the encoding of a CSV file
+                    # http://pandaproject.net/docs/determining-the-encoding-of-a-csv-file.html
+                    try:
+                        dataset = pd.read_csv(csv, encoding='utf-8', dtype=str, na_values=na_values, keep_default_na=False, header=0, engine='c')
+                    except UnicodeDecodeError:
+                        try:
+                            dataset = pd.read_csv(csv, encoding='ansi', dtype=str, na_values=na_values, keep_default_na=False, header=0, engine='c')
+                        except UnicodeDecodeError:
+                            try:
+                                dataset = pd.read_csv(csv, encoding='utf-16', dtype=str, na_values=na_values, keep_default_na=False, header=0, engine='c')
+                            except UnicodeDecodeError:
+                                with open(csv, 'rb') as f:
+                                    bytes = f.read()
+                                    if len(bytes) > 100000:
+                                        with open(csv, 'rb') as f:
+                                            bytes = f.readline()
+                                encode = chardet.detect(bytes)['encoding']
+                                if encode == 'ascii':
+                                    encode = 'ansi' #ansi is a super charset of ascii
+                                dataset = pd.read_csv(csv, encoding=encode, dtype=str, na_filter=False, header=0, engine="c")
                     datasets['sheet1'] = dataset
                 if re.fullmatch('^.*?\\.xlsx?$', excelcsv, flags=(re.IGNORECASE)):
                     isexcel = 1
@@ -213,22 +225,45 @@ class ImportExcel:
         return excelcsvs
 
     def read_data(self, dataset):
+        dataset = dataset.fillna(value="")
+        f = lambda x: str(x).strip()
+        dataset = dataset.applymap(f)
+        f = lambda x: len(x)
+        df1 = dataset.applymap(f)
+        f = lambda x: max(x)
+
+        df3 = df1.apply(f, axis=1)
+        df3 = pd.DataFrame(df3, columns=['c'])
+        indexs = df3.loc[(df3['c'] == 0)].index
+        dataset.drop(indexs, inplace=True)
+
+        # deal with columns
         dataset.columns = [str(col) for col in dataset.columns]
         self.columns = dataset.columns
         low_col = [col.lower() for col in self.columns]
-        if self.indentify_col_name == 1:
-            if 'ignore' in low_col:
-                self.columns = dataset[0:1]
-                self.columns = np.array(self.columns)
-                self.columns = self.columns.tolist()[0]
-                dataset.columns = self.columns
-                dataset.drop(0, inplace=True)
+        s = len(low_col)
+        if 'unnamed: {}'.format(s - 1) in low_col:
+            self.columns = dataset[0:1]
+            self.columns = np.array(self.columns)
+            self.columns = self.columns.tolist()[0]
+            dataset.columns = self.columns
+            dataset.drop(dataset[:1].index, inplace=True)
+            low_col = [col.lower() for col in self.columns]
+
+
+        if 'ignore' in low_col:
+            self.columns = dataset[0:1]
+            self.columns = np.array(self.columns)
+            self.columns = self.columns.tolist()[0]
+            dataset.columns = self.columns
+            dataset.drop(dataset[:1].index, inplace=True)
+
         self.columns = [str(col).strip() for col in self.columns]
         # fix blank col name
-        f = lambda x:"unnamed" if x == "" else x
+        f = lambda x: "unnamed" if x == "" else x
         self.columns = [f(col) for col in self.columns]
 
-        f = lambda x: x if len(x)<=63 else x[:62].strip()
+        f = lambda x: x if len(x) <= 63 else x[:62].strip()
         self.columns = [f(col) for col in self.columns]
         # fix duplicate column name
         while 1:
@@ -258,22 +293,14 @@ class ImportExcel:
         self.columns = np.array(self.columns)
         self.columns = self.columns.tolist()
 
-        dataset = dataset.fillna(value="")
-
-        f = lambda x: str(x).strip()
-        dataset = dataset.applymap(f)
-        f = lambda x: len(x)
-        df1 = dataset.applymap(f)
         f = lambda x: max(x)
+        df1.columns = self.columns
         df2 = df1.apply(f, axis=0)
         col_maxlen = df2.to_dict()
-        df3 = df1.apply(f, axis=1)
-        df3 = pd.DataFrame(df3, columns=['c'])
-        indexs = df3.loc[(df3['c'] == 0)].index
-        dataset.drop(indexs, inplace=True)
 
         f = lambda x: None if x == "" else x
         dataset = dataset.applymap(f)
+
 
         return col_maxlen, dataset
 

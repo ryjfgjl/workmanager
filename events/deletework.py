@@ -18,7 +18,7 @@ class DeleteWork:
     def main(self, currentwork):
         layout = [
             [sg.Text('Warnning!\n\nThis option will remove the work from the tool.\nDo you want to continue?')],
-            [sg.OK(), sg.Button('Just Zip')]
+            [sg.OK(), sg.Button('Just Zip'), sg.Button('OK but not upload zip')]
 
         ]
         window = sg.Window(title=currentwork, layout=layout)
@@ -70,11 +70,13 @@ class DeleteWork:
         zfile.close()
 
         # upload zipfile
-        winscppath = self.HandleConfig.handle_config('g', 'defaultpath', 'winscppath')
-        cmd = '{0}WinSCP.com /command "open aws188" "put {1} /home/neon/leiwu/dataimport/script/" "exit"'.format(winscppath, sqlfile_zip)
-        os.system(cmd)
+        if event != 'OK but not upload zip':
+            winscppath = self.HandleConfig.handle_config('g', 'defaultpath', 'winscppath')
+            cmd = '{0}WinSCP.com /command "open aws188" "put {1} /home/neon/leiwu/dataimport/script/" "exit"'.format(winscppath, sqlfile_zip)
+            os.system(cmd)
 
         if event == 'Just Zip':
+            sg.Popup('Complete!', title=currentwork)
             return 0
         # remove work
         script_temp = jirapath + 'temp\\{}.sql'.format(dbname)
@@ -99,9 +101,13 @@ class DeleteWork:
         if works:
             currentwork = works[-1]
         self.HandleConfig.handle_config('s', 'global', 'currentwork', currentwork)
-        cmd = '/home/neon/leiwu/bin/dataImportRunScript.sh {0}_test {0}'.format(dbname)
-        sg.Popup('Complete!\n\n{0} has been copied.'.format(cmd), title=currentwork)
-        pyperclip.copy(cmd)
+
+        if event != 'OK but not upload zip':
+            cmd = '/home/neon/leiwu/bin/dataImportRunScript.sh {0}_test {0}'.format(dbname)
+            sg.Popup('Complete!\n\n{0} has been copied.'.format(cmd), title=currentwork)
+            pyperclip.copy(cmd)
+        else:
+            sg.Popup('Complete!', title=currentwork)
         
 
 if '__name__' == '__main__':

@@ -51,7 +51,7 @@ class CustomField:
 					continue
 
 				colname = rule.split(':')[0]
-				colname = re.sub(r'^Column [A-Z]{1,2}', '', colname)
+				colname = re.sub(r'^[^a-z0-9].Column [A-Z]{1,2}', '', colname)
 				colname = colname.strip(' \n-,()')
 				colname = '`' + colname + '`'
 
@@ -91,11 +91,8 @@ class CustomField:
 					displaytype = 'C'
 				elif re.search(r'drop[ -]?down', rule_lower):
 					displaytype = 'D'
-				elif 'line text' in rule_lower:
-					if re.search(r'multi(ple)? ?-? ?line text', rule_lower):
-						displaytype = 'M'
-					else:
-						displaytype = 'O'
+				elif re.search(r'multi(ple)? ?-? ?line( text)?', rule_lower):
+					displaytype = 'M'
 				else:
 					displaytype = 'O'
 
@@ -110,11 +107,11 @@ class CustomField:
 				# parse delimiter
 				if re.search('custom field.*?separate', rule, flags=re.I):
 					delimiter = re.split('separate', rule, flags=re.I)[1]
-					if 'comma' in delimiter:
+					if 'comma' in delimiter or '","' in delimiter:
 						delimiter = ','
-					elif 'semicolon' in delimiter:
+					elif 'semicolon' in delimiter or '";"' in delimiter:
 						delimiter = ';'
-					elif 'slash' in delimiter:
+					elif 'slash' in delimiter in delimiter or '"/"':
 						delimiter = '/'
 					else:
 						delimiter = 'NULL'

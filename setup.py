@@ -56,7 +56,7 @@ setup(
             # 产品名称  
            name='workmanager',
             # 版本号  
-            version='2.0',
+            version='2.3',
             # 产品说明  
             description='workmanager',
             options=options,  

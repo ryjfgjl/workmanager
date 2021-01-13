@@ -24,7 +24,7 @@ class AddComment:
             [sg.Text('Role:')],
             [sg.Radio('Importer', 'R0', key='I', default=True), sg.Radio('Tester on aws', 'R0', key='T0'), sg.Radio('Tester on production', 'R0', key='T1')],
             [sg.Text('Person:')],
-            [sg.Combo(personlist, key='P', default_value='Jia Yang')],
+            [sg.Combo(personlist, key='P', default_value='Kun Li')],
             [sg.Submit(), sg.Cancel()]
         ]
         window = sg.Window(title=currentwork, layout=layout)
